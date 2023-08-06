@@ -1,6 +1,8 @@
-﻿using DataAccess.Abstract;
+﻿using Core.DataAccess.EntityFramework;
+using Core.Entities;
+using DataAccess.Abstract;
 using Entities.Concrete;
-using Microsoft.EntityFrameworkCore;
+using Entities.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,59 +12,20 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Concrete.EntityFramework
 {
-    public class EfProductDal : NorthwindContext, IProductDal
+    public class EfProductDal : EfEntityRepositoryBase<Product, NorthwindContext>, IProductDal
     {
-        public void Add(Product entity)
+        public List<ProductDetailDto> GetProductDetails()
         {
-            using (NorthwindContext Context = new NorthwindContext())
+            using (NorthwindContext context = new NorthwindContext())
             {
-                var AddedEntity = Context.Entry(entity);
-                AddedEntity.State = EntityState.Added;
-                Context.SaveChanges();
-            }
-        }
+                var result = from p in context.Products
+                             join c in context.Categories
+                             on p.CategoryId equals c.CategoryId
+                             select new ProductDetailDto 
+                             { ProductId = p.ProductId, ProductName = p.ProductName,
+                                 CategoryName = c.CategoryName, UnitsInStock = p.UnitsInStock };
+                return result.ToList();
 
-        public void Delete(Product entity)
-        {
-            using (NorthwindContext Context = new NorthwindContext())
-            {
-                var DeletedEntity = Context.Entry(entity);
-                DeletedEntity.State = EntityState.Deleted;
-                Context.SaveChanges();
-            }
-        }
-
-        public Product Get(Expression<Func<Product, bool>> filter)
-        {
-            using (NorthwindContext Context=new NorthwindContext())
-            {
-                return Context.Set<Product>().SingleOrDefault(filter);
-            }
-        }
-
-        public List<Product> GetAll(Expression<Func<Product, bool>> filter = null)
-        {
-            using (NorthwindContext Context = new NorthwindContext())
-            {
-                return filter == null
-                    ? Context.Set<Product>().ToList()
-                    : Context.Set<Product>().Where(filter).ToList();
-            }
-
-        }
-
-        public List<Product> GetAllByCategory(int categoryid)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(Product entity)
-        {
-            using (NorthwindContext Context = new NorthwindContext())
-            {
-                var UpdatedEntity = Context.Entry(entity);
-                UpdatedEntity.State = EntityState.Modified;
-                Context.SaveChanges();
             }
         }
     }
