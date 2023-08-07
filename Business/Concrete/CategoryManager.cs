@@ -3,9 +3,7 @@ using DataAccess.Abstract;
 using Entities.Concrete;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Business.Concrete
 {
@@ -20,12 +18,14 @@ namespace Business.Concrete
 
         public List<Category> GetAll()
         {
+            //İş kodları
             return _categoryDal.GetAll();
         }
 
-        public List<Category> GetById(int categoryId)
+        //Select * from Categories where CategoryId = 3
+        public Category GetById(int categoryId)
         {
-            return _categoryDal.GetAll(c=>c.CategoryId==categoryId);
+            return _categoryDal.Get(c=>c.CategoryId == categoryId);
         }
     }
 }
