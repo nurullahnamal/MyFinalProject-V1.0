@@ -8,12 +8,23 @@ namespace ConsoleUI
     {
         static void Main(string[] args)
         {
-            ProductManager productManager =new ProductManager(new EfProductDal());
+            ProductManager productManager = new ProductManager(new EfProductDal());
+            var result = productManager.GetProductDetails();
 
-            foreach (var item in productManager.GetProductDetails())
+
+            if (result.Success)
             {
-                Console.WriteLine(  item.CategoryName);
+                foreach (var product in result.Data)
+                {
+                    Console.WriteLine(product.ProductName+"/"+product.CategoryName);
+                }
             }
+            else
+            {
+                Console.WriteLine(result.Message);
+            }
+
+
         }
     }
 }
