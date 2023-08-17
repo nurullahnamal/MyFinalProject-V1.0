@@ -5,9 +5,13 @@ using DataAccess.Abstract;
 using DataAccess.Concrete.InMemory;
 using Entities.Concrete;
 using Entities.DTOs;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Validation;
+using Core.CrossCuttingConcerns.Validation;
 
 namespace Business.Concrete
 {
@@ -21,13 +25,10 @@ namespace Business.Concrete
         }
 
         //[LogAspect]
-        //[Validate]
+        [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         {
-            if (product.ProductName.Length<2)
-            {
-                return new ErrorResult(Messages.ProductNameInvalid);
-            }
+            //business Codes
             _productDal.Add(product);
 
             return new SuccessResult(Messages.ProductAdded);
@@ -37,7 +38,7 @@ namespace Business.Concrete
 
         public IDataResult< List<Product>> GetAll()
         {
-            if (DateTime.Now.Hour == 15)
+            if (DateTime.Now.Hour == 18)
             {
                 return new ErrorDataResult<List<Product>>(Messages.MaintenanceTime);
             }
