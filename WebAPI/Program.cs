@@ -2,6 +2,9 @@ using System.Configuration;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Business.DependencyResolvers.Autofac;
+using Core.DependencyResolvers;
+using Core.Extensions;
+using Core.Utilities.IoC;
 using Core.Utilities.Security.Encryption;
 using Core.Utilities.Security.JWT;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -27,8 +30,8 @@ builder.Host.ConfigureContainer<ContainerBuilder>(options =>
 });
 
 //builder.Services.AddSingleton<IProductService, ProductManager>();
-builder.Services.AddSingleton<IHttpContextAccessor , HttpContextAccessor>();
 
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 var tokenOptions = builder.Configuration.GetSection("TokenOptions").Get<TokenOptions>();
 
@@ -46,6 +49,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey)
         };
     });
+builder.Services.AddDependencyResolvers(new ICoreModule[]
+{
+    new CoreModule()
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -3,6 +3,7 @@ using Business.BusinessAspects.Autofac;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Validation;
+using Core.CrossCuttingConcerns.Caching;
 using Core.Utilities.Business;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
@@ -15,15 +16,17 @@ namespace Business.Concrete
     {
         IProductDal _productDal;
         ICategoryService _categoryService;
+        ICacheManager _cacheManager;
 
 
         public ProductManager(IProductDal productDal, ICategoryService categoryService)
         {
             _productDal = productDal;
             _categoryService = categoryService;
+           
         }
 
-        [SecuredOperation("product.add,admin")]
+        //[SecuredOperation("product.add,admin")]
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         {
@@ -38,9 +41,10 @@ namespace Business.Concrete
 
             return new SuccessResult(Messages.ProductAdded);
         }
-
+        [CacheAspect]
         public IDataResult<List<Product>> GetAll()
         {
+
             if (DateTime.Now.Hour == 18)
             {
                 return new ErrorDataResult<List<Product>>(Messages.MaintenanceTime);
